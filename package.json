@@ -1,0 +1,22 @@
+{
+  "name": "genzen-assessment-form",
+  "version": "1.0.0",
+  "description": "Assessment form component for GenZen Solutions",
+  "main": "src/components/AssessmentForm.astro",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "astro",
+    "form",
+    "assessment"
+  ],
+  "author": "Adam King",
+  "license": "MIT",
+  "dependencies": {
+    "alpinejs": "^3.13.3"
+  },
+  "peerDependencies": {
+    "astro": "^3.0.0"
+  }
+} 

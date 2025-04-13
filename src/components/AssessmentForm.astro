@@ -1,54 +1,93 @@
+---
+interface Props {
+  title?: string;
+  submitUrl?: string;
+  buttonText?: string;
+  successMessage?: string;
+  errorMessage?: string;
+  theme?: 'light' | 'dark';
+}
+
+const {
+  title = "Legacy Threat Assessment",
+  submitUrl = "https://formspree.io/f/your-form-id",
+  buttonText = "Submit Assessment",
+  successMessage = "Thank you for your submission. We'll be in touch soon.",
+  errorMessage = "There was an error submitting your form. Please try again.",
+  theme = "light"
+} = Astro.props;
+---
+
 <section class="py-16 sm:py-24 md:py-32 bg-[#f4f4f5]">
   <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
     <h2 class="text-2xl sm:text-3xl md:text-4xl font-normal mb-8 sm:mb-12 text-[#222222]" data-aos="fade-up">Initial Assessment Application</h2>
     
     <div x-data="{
-      step: 1,
-      totalSteps: 4,
+      currentStep: 1,
+      totalSteps: 5,
       formData: {
-        // Basic Information
         name: '',
         email: '',
-        contactMethod: '',
-        referralSource: '',
-        
-        // Context Overview
-        situation: [],
-        situationOther: '',
-        
-        // Pattern Recognition
-        situationDescription: '',
-        previousApproaches: '',
-        
-        // Urgency Assessment
+        phone: '',
+        company: '',
+        role: '',
+        situation: '',
         timeline: '',
-        
-        // Strategic Alignment
-        transformationIndicators: [],
-        successDefinition: '',
-        
-        // Value Assessment
-        investmentRange: '',
-        additionalInformation: ''
+        budget: '',
+        additionalInfo: ''
       },
+      submitted: false,
+      error: false,
       nextStep() {
-        if (this.step < this.totalSteps) {
-          this.step++
+        if (this.currentStep < this.totalSteps) {
+          this.currentStep++;
         }
       },
       prevStep() {
-        if (this.step > 1) {
-          this.step--
+        if (this.currentStep > 1) {
+          this.currentStep--;
         }
       },
-      submitForm() {
-        // Handle form submission here
-        console.log('Form submitted:', this.formData)
+      async submitForm() {
+        try {
+          const response = await fetch(submitUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(this.formData),
+          });
+          
+          if (response.ok) {
+            this.submitted = true;
+          } else {
+            this.error = true;
+          }
+        } catch (error) {
+          this.error = true;
+          console.error('Form submission error:', error);
+        }
       }
     }" class="rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 md:p-8" data-aos="fade-up" data-aos-delay="100">
       <!-- Progress bar -->
       <div class="mb-6 sm:mb-8">
         <div class="flex justify-between mb-2">
+          <span class="text-sm font-medium text-gray-700">Step <span x-text="currentStep"></span> of <span x-text="totalSteps"></span></span>
+          <span class="text-sm font-medium text-gray-700" x-text="Math.round((currentStep / totalSteps) * 100) + '%'"></span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2.5">
+          <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" x-bind:style="'width: ' + (currentStep / totalSteps * 100) + '%'"></div>
+        </div>
+      </div>
+
+      <!-- Form steps -->
+      <div class="space-y-6">
+        <!-- Step 1: Personal Information -->
+        <div x-show="currentStep === 1" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-x-4" x-transition:enter-end="opacity-100 transform translate-x-0">
+          <h3 class="text-xl font-medium mb-4">Personal Information</h3>
+          <div class="space-y-4">
+            <div>
+              <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
           <template x-for="i in totalSteps" :key="i">
             <div class="flex items-center">
               <div :class="{'bg-[#1d273a]': step >= i, 'bg-gray-200': step < i}"
